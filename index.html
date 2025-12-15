@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CompletCraft - Protege tu Historia</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CORE MINECRAFT.NET PALETTE --- */
+        :root {
+            --mc-bg-page: #191919;
+            --mc-bg-card: #282828;
+            --mc-bg-card-hover: #313233;
+            --mc-green-main: #3C8527;
+            --mc-green-light: #58A53E;
+            --mc-green-dark: #1E4D13;
+            --mc-green-hover: #459E2A;
+            --mc-text-white: #FFFFFF;
+            --mc-text-gray: #CCCCCC;
+            --mc-red: #D22630;
+            --mc-gold: #F5C342;
+            --mc-border-black: #000000;
+            --font-title: 'VT323', monospace;
+            --font-body: 'Noto Sans', sans-serif;
+        }
+
+        /* --- RESET Y BLOQUEO DE DESBORDAMIENTO (CRÍTICO PARA CELULAR) --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden; /* Esto evita que la página se vaya de lado */
+            position: relative;
+        }
+
+        body {
+            background-color: var(--mc-bg-page);
+            color: var(--mc-text-white);
+            font-family: var(--font-body);
+            line-height: 1.6;
+        }
+
+        /* TIPOGRAFÍA GENERAL (PC) */
+        h1, h2, h3, h4 {
+            font-family: var(--font-title);
+            text-transform: uppercase;
+            line-height: 1.1;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0 #000;
+        }
+        h1 { font-size: 4rem; margin-bottom: 1rem; }
+        h2 { font-size: 3rem; margin-bottom: 2rem; }
+        h3 { font-size: 1.8rem; color: #fff; margin-bottom: 0.5rem; }
+        
+        p { font-size: 1.1rem; color: var(--mc-text-gray); margin-bottom: 1.5rem; }
+        strong { color: #fff; font-weight: 900; }
+        .text-highlight-gold { color: var(--mc-gold); font-weight: 900; text-decoration: underline; text-decoration-color: #fff; text-underline-offset: 3px; }
+
+        /* BOTONES */
+        .btn-mc {
+            display: inline-block;
+            background-color: var(--mc-green-main);
+            color: #fff;
+            font-family: var(--font-body);
+            font-weight: 900;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            border: 2px solid #000;
+            box-shadow: inset 3px 3px 0 var(--mc-green-light), inset -3px -3px 0 var(--mc-green-dark);
+        }
+        .btn-mc:hover {
+            background-color: var(--mc-green-hover);
+            transform: translateY(-2px);
+            box-shadow: inset 3px 3px 0 #72CB55, inset -3px -3px 0 #235A17, 0 4px 0 #000;
+        }
+        .btn-mc:active {
+            transform: translateY(2px);
+            box-shadow: inset 3px 3px 0 var(--mc-green-dark), inset -3px -3px 0 var(--mc-green-light);
+        }
+        .btn-secondary { background-color: #48494a; box-shadow: inset 3px 3px 0 #6c6d6e, inset -3px -3px 0 #282828; }
+        .btn-secondary:hover { background-color: #5a5b5c; }
+        .btn-danger { background-color: var(--mc-red); box-shadow: inset 3px 3px 0 #ff5c5c, inset -3px -3px 0 #800000; }
+
+        /* CARDS / PANELES */
+        .mc-card {
+            background-color: var(--mc-bg-card);
+            padding: 0;
+            position: relative;
+            transition: transform 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid #000;
+        }
+        .mc-card:hover { transform: translateY(-5px); z-index: 10; outline: 3px solid var(--mc-green-main); }
+        .mc-card-content { padding: 2rem; flex-grow: 1; border-top: 4px solid #000; }
+        .mc-card-header { background-color: #000; color: #fff; padding: 10px 20px; font-family: var(--font-title); font-size: 1.5rem; text-align: center; }
+        .pixel-badge { display: inline-block; padding: 5px 10px; font-family: var(--font-title); font-size: 1.2rem; margin-bottom: 1rem; border: 2px solid #000; }
+
+        /* ESTRUCTURA Y FONDOS */
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 0 20px; 
+            position: relative; 
+            z-index: 5;
+            width: 100%; /* Asegura ancho completo */
+        }
+
+        /* HERO + BLUR */
+        .bg-hero {
+            position: relative;
+            min-height: 90vh; 
+            display: flex; 
+            align-items: center; 
+            padding: 100px 0;
+            overflow: hidden;
+        }
+        .bg-hero::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(25,25,25,1)), 
+            url('https://imgur.com/ZTYY7aH.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            filter: blur(8px); 
+            transform: scale(1.1); 
+        }
+
+        .bg-nether { background-color: #1a0505; border-top: 2px solid #3d0e0e; }
+        .bg-dark { background-color: var(--mc-bg-page); }
+        .bg-end { background-color: #0d0611; border-top: 2px solid #2a1035; }
+        
+        .embedded-frame { background: #000; padding: 10px; display: inline-block; transform: rotate(-1deg); margin-bottom: 2rem; box-shadow: 8px 8px 0 rgba(0,0,0,0.5); }
+        .embedded-frame img { display: block; max-width: 100%; border: 1px solid #333; }
+        .highlight-red { color: var(--mc-red); font-weight: 900; text-transform: uppercase; }
+        .highlight-pop { color: #fff; font-weight: 900; text-decoration: underline; text-decoration-color: var(--mc-red); text-underline-offset: 4px; }
+        
+        /* UTILIDADES */
+        .chat-box { background: rgba(0,0,0,0.6); border: 2px solid #000; padding: 15px; font-family: 'Noto Sans', monospace; color: #fff; text-align: left; }
+        .chat-avatar { width: 32px; height: 32px; border: 2px solid #fff; vertical-align: middle; margin-right: 8px; display: inline-block; }
+        .testimonial-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .user-avatar { width: 40px; height: 40px; border: 2px solid #fff; border-radius: 4px; }
+        .testimonial-shot { width: 100%; height: auto; border: 2px solid #000; margin-top: 10px; display: block; }
+        .small-text { font-size: 0.8rem; color: #888; }
+        .voxel-bubble { background: url('https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/img/dirt.png'); background-size: 64px; color: #fff; padding: 20px; border: 4px solid #000; text-align: center; font-family: var(--font-title); font-size: 1.5rem; text-shadow: 2px 2px 0 #000; margin: 40px auto; max-width: 600px; position: relative; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        
+        /* FAQ & HERRAMIENTAS */
+        .faq-item { background: var(--mc-bg-card); margin-bottom: 5px; border: 2px solid #000; }
+        .faq-header { padding: 20px; cursor: pointer; font-weight: 700; display: flex; justify-content: space-between; }
+        .faq-header:hover { background-color: var(--mc-bg-card-hover); color: var(--mc-green-light); }
+        .faq-content { background: #111; color: #aaa; max-height: 0; overflow: hidden; transition: max-height 0.3s ease; padding: 0 20px; }
+        .faq-content.active { padding: 20px; max-height: 1000px; border-top: 1px solid #333; }
+        .progress-container { background: #000; border: 2px solid #555; height: 40px; margin: 20px 0; }
+        .progress-bar { background: var(--mc-green-main); height: 100%; width: 0%; transition: width 0.5s; background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 40px 40px; }
+        .mc-input { width: 100%; padding: 15px; background: #000; border: 2px solid #555; color: #fff; font-family: var(--font-body); font-size: 1rem; margin-bottom: 15px; }
+        .full-img { width: 100%; height: auto; display: block; border: 2px solid #000; }
+
+        /* --- NAVIGATION DESKTOP DEFAULT --- */
+        nav {
+            background: #000;
+            height: 90px; 
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #333;
+            display: flex;
+            align-items: center; 
+        }
+        .nav-inner {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            height: 100%;
+        }
+        .logo-nav {
+            height: 110px; /* Logo grande en PC */
+            width: auto;
+            display: block;
+        }
+
+        /* ---------------------------------------------------- */
+        /* --- OPTIMIZACIÓN MÓVIL (MEDIA QUERIES) --- */
+        /* ---------------------------------------------------- */
+        @media (max-width: 768px) {
+            
+            /* 1. Ajuste de Textos Gigantes */
+            h1 { font-size: 2.8rem; line-height: 1.1; }
+            h2 { font-size: 2.2rem; }
+            h3 { font-size: 1.5rem; }
+            p { font-size: 1rem; }
+
+            /* 2. Ajuste de Barra de Navegación */
+            nav { height: 70px; } /* Barra más fina en móvil */
+            .logo-nav { height: 60px; } /* Logo más chico para que no rompa */
+            .nav-inner { padding: 0 15px; }
+            .btn-mc { 
+                padding: 10px 15px; /* Botón un poco más compacto */
+                font-size: 0.85rem; 
+            }
+
+            /* 3. Ajuste de Espaciados (Padding) y centrado */
+            section, .bg-hero, .bg-nether, .bg-dark, .bg-end {
+                padding: 60px 0 !important; /* Menos espacio vertical */
+            }
+            .container { padding: 0 15px; width: 100%; }
+
+            /* 4. Grillas a 1 columna */
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+
+            /* 5. Ajustes Específicos */
+            .voxel-bubble { margin: 20px auto; font-size: 1.2rem; width: 100%; }
+            .embedded-frame img { max-width: 100%; height: auto; }
+            
+            /* Forzar que no haya desbordamiento */
+            .mc-card { min-width: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-inner">
+            <img src="https://imgur.com/Hms2bZH.png" alt="Logo CompletCraft" class="logo-nav">
+            <a href="#riesgo" class="btn-mc">VERIFICAR ESTADO</a>
+        </div>
+    </nav>
+
+    <section id="inicio" class="bg-hero">
+        <div class="container" style="text-align: center;">
+            <h1 style="font-size: 4.5rem; text-shadow: 4px 4px 0 #000;">LA VÍA RÁPIDA PARA PROTEGER TU CUENTA</h1>
+            <p style="font-size: 1.5rem; color: #fff; text-shadow: 2px 2px 0 #000;">No dejes que años de historia y tu nick desaparezcan en un segundo.</p>
+            <div style="margin-top: 40px;">
+                <a href="#riesgo" class="btn-mc">VER SI MI CUENTA ESTÁ EN RIESGO</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="dolor" class="bg-nether" style="padding: 80px 0;">
+        <div class="container" style="text-align: center;">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <h2 style="color: #fff;">¿TU LEGADO EN PELIGRO?</h2>
+                
+                <p>Tu cuenta que te acompaña hace años puede estar en manos equivocadas si no <span class="highlight-pop">cerrás las puertas correctas.</span></p>
+                <p>La cuenta que te regalaron, que vos compraste con tanto esfuerzo, la que tenés hace años.</p>
+                
+                <div class="embedded-frame">
+                    <img src="https://preview.redd.it/who-created-the-legendary-steve-sitting-wallpaper-v0-d2dddl9xidl91.jpg?width=1080&crop=smart&auto=webp&s=983a4e084447aaa08a25ffb91e7f0679b2cc1ef3" alt="Steve Nostalgia" style="max-width: 600px;">
+                </div>
+
+                <div style="background: #1a0505; border: 2px solid #3d0e0e; padding: 20px; margin-top: 20px;">
+                    <p style="font-size: 1.2rem;">Si alguien entra, no solo perdés el acceso:</p>
+                    <h3 class="highlight-red">PERDÉS TU NOMBRE, TU HISTORIA, TU INFANCIA</h3>
+                </div>
+                
+                <ul style="list-style: none; margin: 30px auto; max-width: 600px; text-align: left;">
+                    <li style="margin-bottom: 10px;">❌ NO necesitas "hacer algo" para que te pase.</li>
+                    <li style="margin-bottom: 10px;">❌ A la mayoría le pasa por un descuido o un launcher no premium.</li>
+                    <li style="margin-bottom: 10px;">❌ Y cuando pasa... ya es tarde.</li>
+                </ul>
+
+                <a href="#riesgo" class="btn-mc">Ver si mi cuenta está en Riesgo</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="negacion" class="bg-dark" style="padding: 80px 0;">
+        <div class="container">
+            <h2 class="text-center">"A MÍ NUNCA ME PASARÁ"</h2>
+            <p class="text-center">A los que ya perdieron su cuenta, les parecía imposible que algún día la perdieran... Pero sé inteligente y no caigas en ese pensamiento.</p>
+            
+            <div style="background: #222; padding: 20px; border: 1px solid #444; margin-bottom: 30px; text-align: center;">
+                <p>Si tu pensamiento es el siguiente:</p>
+                <p style="font-style: italic; color: #fff;">"Yo no comparto mi cuenta", "yo no caigo en estafas/scams", "yo soy cuidadoso".</p>
+                <p>Esos son los mismos pensamientos que te llevarán a un callejón sin salida, del que no saldrás.</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="mc-card">
+                    <div class="mc-card-header">TESTIMONIO REAL</div>
+                    <div class="mc-card-content" style="background: #000; padding: 0;">
+                        <img src="https://imgur.com/fGvKiNn.png" alt="Testimonio Cuenta Hackeada" class="full-img">
+                    </div>
+                </div>
+
+                <div class="mc-card">
+                    <div class="mc-card-header">CREADOR</div>
+                    <div class="mc-card-content" style="background: url('https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/img/dirt.png');">
+                        <div class="chat-box">
+                            <p style="margin: 0; line-height: 1.4;">
+                                <img src="https://imgur.com/MiruIA2.png" class="chat-avatar" alt="Guille">
+                                <span style="color: var(--mc-gold); font-weight: bold;">Guille:</span> 
+                                "Solo una puerta abierta es suficiente para que estés vulnerable y vos sin saberlo. Muchos se están enterando ahora, pero aún estás a tiempo."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; font-size: 3rem; margin: 40px 0;">⬇️⬇️⬇️⬇️</div>
+
+            <div class="voxel-bubble">
+                Y no perdés una cuenta <br>
+                <span class="highlight-red">(perdés algo más importante)</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="valor" class="bg-dark" style="padding: 50px 0;">
+        <div class="container">
+            <h2 class="text-center" style="color: var(--mc-green-light);">NO PERDÉS <span class="text-highlight-gold">"TU CUENTA"</span>, PERDÉS ALGO QUE <span class="text-highlight-gold">NO TIENE PRECIO</span></h2>
+            
+            <div class="grid-3" style="margin-top: 40px;">
+                <div class="mc-card">
+                    <div class="mc-card-content text-center">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🏷️</div>
+                        <h3>IDENTIDAD</h3>
+                        <p>Tu nombre / tu identidad dentro de Minecraft (tu nick de hace años).</p>
+                    </div>
+                </div>
+                <div class="mc-card">
+                    <div class="mc-card-content text-center">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🏰</div>
+                        <h3>RECUERDOS</h3>
+                        <p>Tus recuerdos, progreso de servidores, lista de amigos, cosméticos premium, rangos VIP, etc.</p>
+                    </div>
+                </div>
+                <div class="mc-card">
+                    <div class="mc-card-content text-center">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">💎</div>
+                        <h3>VALOR</h3>
+                        <p>El valor económico más allá de lo sentimental.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;">
+                <div class="mc-card">
+                    <div class="mc-card-content text-center">
+                        <h3>TRANQUILIDAD</h3>
+                        <p>Perdés automáticamente esa "tranquilidad" de entrar al juego con lo que siempre tuviste.</p>
+                        <hr style="border-color: #333; margin: 20px 0;">
+                        <p style="color: #fff; font-size: 1.2rem;">Lo peor no es pagar otra cuenta, lo peor es que perdés esa cuenta a la que tanto <span class="text-highlight-gold">tiempo le dedicaste</span>, tuviste tantas <span class="text-highlight-gold">experiencias</span> que no tienen precio.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="panel" class="bg-dark" style="padding: 50px 0;">
+        <div class="container">
+            <h2 class="text-center">ASÍ SE VE EL BLINDAJE</h2>
+            <div class="grid-2">
+                <div class="mc-card">
+                    <div class="mc-card-header">PANEL COMPLETCRAFT</div>
+                    <div class="mc-card-content" style="background: #000; padding: 0;">
+                        <img src="https://imgur.com/dvk1RrT.png" alt="Panel CompletCraft" class="full-img">
+                    </div>
+                </div>
+                <div class="mc-card">
+                    <div class="mc-card-header">LO QUE OBTIENES</div>
+                    <div class="mc-card-content" style="background: #222; text-align: center;">
+                        
+                        <div style="background: var(--mc-green-dark); padding: 10px; border: 2px solid var(--mc-green-light); margin-bottom: 15px; text-align: left;">
+                            <p style="color: #fff; margin: 0; font-weight: bold; font-size: 1rem;">
+                                ✅ +25 pasos en total por cada uno de los módulos.<br>
+                                ✅ Link SEGURO para acceder a hacer los cambios de la manera más fácil y segura.
+                            </p>
+                        </div>
+
+                        <img src="https://imgur.com/EJ1wHqr.png" alt="Módulos CompletCraft" class="full-img">
+                    </div>
+                </div>
+            </div>
+            <p class="text-center" style="margin-top: 20px;">Métrica de cómo quedó toda tu cuenta luego de poner toda la configuración.</p>
+        </div>
+    </section>
+
+    <section id="como-funciona" class="bg-end" style="padding: 80px 0;">
+        <div class="container">
+            <h2 class="text-center">ESTOS 3 PASOS HAREMOS PARA QUE A VOS NO TE PASE</h2>
+            
+            <div class="grid-3" style="margin-top: 40px; margin-bottom: 80px;">
+                <div class="mc-card">
+                    <div class="mc-card-content">
+                        <div class="pixel-badge" style="background: var(--mc-green-light); color: #fff;">PASO 1</div>
+                        <h3 style="margin-top: 10px;">RECOPILACIÓN</h3>
+                        <p>Se recopilan los <span class="text-highlight-gold">12 pasos</span> clave para evitar que pierdas tu cuenta.</p>
+                    </div>
+                </div>
+                <div class="mc-card">
+                    <div class="mc-card-content">
+                        <div class="pixel-badge" style="background: var(--mc-green-light); color: #fff;">PASO 2</div>
+                        <h3 style="margin-top: 10px;">EJECUCIÓN</h3>
+                        <p>Aplicarás cada uno de esos 12 pasos claves que muy pocas personas conocen, sin que des ningún acceso a tu cuenta de Minecraft Premium.</p>
+                    </div>
+                </div>
+                <div class="mc-card">
+                    <div class="mc-card-content">
+                        <div class="pixel-badge" style="background: var(--mc-green-light); color: #fff;">PASO 3</div>
+                        <h3 style="margin-top: 10px;">CERTIFICADO</h3>
+                        <p>Una vez aplicados todos los pasos, quedarás totalmente protegido y se te generará un certificado de "Usuario-Protegido".</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="text-center" style="margin-bottom: 40px; color: var(--mc-gold);">JUGADORES QUE YA ESTÁN PROTEGIDOS</h2>
+            
+            <div class="grid-3">
+                <div class="mc-card">
+                    <div class="mc-card-content">
+                        <div class="testimonial-header">
+                            <img src="https://imgur.com/yaZVFSU.png" alt="@Jose23.10" class="user-avatar">
+                            <div>
+                                <strong style="color: var(--mc-green-light);">@Jose23.10</strong><br>
+                                <span class="small-text">(usuario de Discord)</span>
+                            </div>
+                        </div>
+                        <p>“Hice el modo exprés y en 15 min ya tenía 2FA y todo verde. Tremendo.”</p>
+                        <img src="https://imgur.com/tcATg3V.png" alt="Testimonio" class="testimonial-shot">
+                    </div>
+                </div>
+
+                <div class="mc-card">
+                    <div class="mc-card-content">
+                         <div class="testimonial-header">
+                            <img src="https://imgur.com/tZwYby5.png" alt="@the_morsilla01" class="user-avatar">
+                            <div>
+                                <strong style="color: var(--mc-green-light);">@the_morsilla01</strong><br>
+                                <span class="small-text">(usuario de Discord)</span>
+                            </div>
+                        </div>
+                        <p>“El certificado y el rol en Discord son la frutilla del postre. Cero estrés.”</p>
+                        <img src="https://imgur.com/Bsd0ZQ8.png" alt="Testimonio" class="testimonial-shot">
+                    </div>
+                </div>
+
+                <div class="mc-card">
+                    <div class="mc-card-content">
+                         <div class="testimonial-header">
+                            <img src="https://imgur.com/Vky8utU.png" alt="@nanii.xit" class="user-avatar">
+                            <div>
+                                <strong style="color: var(--mc-green-light);">@nanii.xit</strong><br>
+                                <span class="small-text">(usuario de Discord)</span>
+                            </div>
+                        </div>
+                        <p>“Mucho mejor que buscar videos sueltos. Todo claro y actualizado.”</p>
+                        <img src="https://imgur.com/BycLxca.png" alt="Testimonio" class="testimonial-shot">
+                    </div>
+                </div>
+
+                <div class="mc-card">
+                    <div class="mc-card-content">
+                         <div class="testimonial-header">
+                            <img src="https://imgur.com/oDqPZO4.png" alt="@mc.eyes" class="user-avatar">
+                            <div>
+                                <strong style="color: var(--mc-green-light);">@mc.eyes</strong><br>
+                                <span class="small-text">(usuario de Discord)</span>
+                            </div>
+                        </div>
+                        <p>funcionando todo perfecto, bien protegido. ahora a jugar tranquilo :D</p>
+                        <img src="https://imgur.com/46LvOOm.png" alt="Testimonio" class="testimonial-shot">
+                    </div>
+                </div>
+
+                <div class="mc-card">
+                    <div class="mc-card-content">
+                         <div class="testimonial-header">
+                            <img src="https://imgur.com/tVMhHlm.png" alt="@valen_god" class="user-avatar">
+                            <div>
+                                <strong style="color: var(--mc-green-light);">@valen_god</strong><br>
+                                <span class="small-text">(usuario de Discord)</span>
+                            </div>
+                        </div>
+                        <p>Lo estuve probando y eh implementado la mayoria de cosas y la verdad que todo excelente. 10/10</p>
+                        <img src="https://imgur.com/q9VSCgw.png" alt="Testimonio" class="testimonial-shot">
+                    </div>
+                </div>
+
+                <div class="mc-card">
+                    <div class="mc-card-content">
+                         <div class="testimonial-header">
+                            <img src="https://imgur.com/QhB0HvH.png" alt="@geroo1405" class="user-avatar">
+                            <div>
+                                <strong style="color: var(--mc-green-light);">@geroo1405</strong><br>
+                                <span class="small-text">(usuario de Discord)</span>
+                            </div>
+                        </div>
+                        <p>por ahora todo perfecto, muy buena atención y muy bien protegida... vuelvo en 3 meses a actualizar</p>
+                        <img src="https://imgur.com/oD0pisU.png" alt="Testimonio" class="testimonial-shot">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="garantia" class="bg-dark" style="padding: 80px 0;">
+        <div class="container" style="max-width: 800px;">
+            <div style="background: #222; border: 4px solid var(--mc-gold); padding: 40px; text-align: center;">
+                <h2 style="color: var(--mc-gold);">TE DEVOLVEMOS EL 100% DEL DINERO SIN PREGUNTAS</h2>
+                <p>Nosotros necesitamos personas que apliquen cada uno de los pasos y estén dispuestas a nunca más preocuparse por su cuenta premium, ese es nuestro objetivo. Si creés que CompletCraft no lo cumple, no hay problema, te daremos el reembolso completo.</p>
+                
+                <ul style="list-style: none; text-align: left; margin: 30px auto; display: inline-block;">
+                    <li>✅ 30 días para probarlo</li>
+                    <li>✅ Un mensaje y te hacemos el reembolso</li>
+                    <li>✅ Reembolso (COMPLETO)</li>
+                    <li>✅ Sin ninguna pregunta de por medio</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="bg-dark" style="padding-bottom: 80px;">
+        <div class="container" style="max-width: 800px;">
+            <h2 class="text-center" style="margin-top: 40px;">PREGUNTAS Y RESPUESTAS</h2>
+            <div style="margin-top: 30px;">
+                
+                <div class="faq-item">
+                    <div class="faq-header">¿Necesitan mi contraseña?</div>
+                    <div class="faq-content"><p>No. No compartís contraseñas ni datos sensibles. Vos ejecutás los cambios; el asistente te guía.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Puedo usarlo en PC/Mac/Consola?</div>
+                    <div class="faq-content"><p>Sí. Blindás tu cuenta Microsoft, que sirve para Java/Bedrock y consolas.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Y si ya me hackearon?</div>
+                    <div class="faq-content"><p>Este pack no recupera cuentas robadas. Te sirve para blindar tu nueva cuenta y evitar perder otra.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Qué son las herramientas IA y cómo se han creado?</div>
+                    <div class="faq-content"><p>Las herramientas son personalizadas creadas con ChatGPT. Las hemos entrenado con información de alta calidad para proteger y resolver todas las dudas que tengas sobre tu cuenta de Minecraft en tiempo real. Podés usarlas con una cuenta gratuita de ChatGPT, sin necesidad de instalar nada.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Y si igual me hackean?</div>
+                    <div class="faq-content"><p>Si aplicaste CompletCraft y aun así te vulneran, te devolvemos tu cuenta o su valor. Ninguna guía gratis te ofrece eso.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Qué pasa cuando adquiera CompletCraft?</div>
+                    <div class="faq-content"><p>Al momento de adquirir CompletCraft, te llegará un email con la compra y te aparecerá un nuevo canal en Discord dándote la bienvenida.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Cómo veo CompletCraft?</div>
+                    <div class="faq-content"><p>No tendrás que entrar a ninguna página rara ni nada por el estilo. Recibirás toda la información por Discord, y es indispensable que estés allí y que al momento de la compra inicies sesión con tu cuenta de Discord.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">El precio es mucho.</div>
+                    <div class="faq-content"><p>Tu cuenta vale más. Con capas, logros y skins únicas, perderla cuesta cientos. CompletCraft cuesta menos que volver a empezar.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Y si no me sirve?</div>
+                    <div class="faq-content"><p>Tenés 30 días para probarlo. Si no quedás blindado o no te convence, te devolvemos el 100% sin preguntas.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">Ya tengo 2FA, no necesito esto.</div>
+                    <div class="faq-content"><p>El 2FA bloquea el acceso. CompletCraft bloquea el robo antes de que empiece. 🔓 Descubrí por qué miles ya no confían solo en el 2FA.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Me va a llevar mucho tiempo aplicar la protección?</div>
+                    <div class="faq-content"><p>No, CompletCraft está diseñado para que en alrededor de 15 minutos puedas proteger tu cuenta, como las más de 1000 personas que ya lo hicieron.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">No confío en sistemas externos.</div>
+                    <div class="faq-content"><p>No pedimos tus datos ni contraseñas. Todo lo hacés desde tu PC o celular.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">Puedo buscar guías gratis en YouTube.</div>
+                    <div class="faq-content"><p>Podés, pero nadie te responde cuando algo falla. CompletCraft te corrige en tiempo real y te da garantía de devolución total.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">No tengo plata.</div>
+                    <div class="faq-content"><p>Si hoy perdés tu cuenta, perdés años de progreso. CompletCraft cuesta menos que una cuenta nueva y evita que tengas que empezar de cero. 🛡️</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Puedo comprar solo algunas partes de CompletCraft?</div>
+                    <div class="faq-content"><p>No, no los vendemos de forma independiente.</p></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header">¿Y si lo compro y no me gusta?</div>
+                    <div class="faq-content"><p>Podés abrir un ticket en nuestro Discord y te damos el reembolso, sin ningún problema.</p></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="riesgo" class="bg-end" style="padding: 100px 0; text-align: center;">
+        <div class="container">
+            <h2 style="color: var(--mc-red);">VERIFICADOR DE VULNERABILIDAD</h2>
+            <div style="max-width: 600px; margin: 40px auto; background: var(--mc-bg-card); padding: 40px; border: 2px solid #555;">
+                <label style="display: block; text-align: left; margin-bottom: 10px; font-weight: bold;">GAMETAG DE MINECRAFT:</label>
+                <input type="text" class="mc-input" id="gametagInput" placeholder="Ej: Steve_Oficial...">
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="riskBar"></div>
+                </div>
+                <p id="riskMsg" style="min-height: 30px; font-weight: bold; color: var(--mc-text-gray);">ESPERANDO ANÁLISIS...</p>
+                
+                <button class="btn-mc" onclick="runCheck()" style="width: 100%; margin-top: 20px;">INICIAR ESCANEO</button>
+            </div>
+            
+            <div id="final-cta" style="display: none; margin-top: 40px;">
+                <div style="background: var(--mc-red); color: #fff; padding: 20px; display: inline-block; transform: rotate(1deg); margin-bottom: 20px;">
+                    <h3 style="margin: 0; text-shadow: none;">⚠️ 11/12 PUERTAS ABIERTAS DETECTADAS</h3>
+                </div>
+                <br>
+                <a href="#checkout" class="btn-mc btn-danger" style="font-size: 1.5rem;">CERRAR PUERTAS AHORA (BLINDAR)</a>
+            </div>
+        </div>
+    </section>
+
+    <footer style="background: #000; padding: 50px 0; text-align: center; border-top: 4px solid #333;">
+        <div class="container">
+            <p style="font-size: 0.9rem; color: #555;">
+                NO AFILIADO A MOJANG NI MICROSOFT.<br>
+                CompletCraft es un servicio independiente de seguridad educativa.
+            </p>
+            <div style="margin-top: 20px;">
+                <a href="#" style="color: #777; text-decoration: none; margin: 0 10px;">Términos</a>
+                <a href="#" style="color: #777; text-decoration: none; margin: 0 10px;">Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Acordeón FAQ
+        document.querySelectorAll('.faq-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('active');
+            });
+        });
+
+        // Simulador
+        function runCheck() {
+            const input = document.getElementById('gametagInput');
+            const bar = document.getElementById('riskBar');
+            const msg = document.getElementById('riskMsg');
+            const cta = document.getElementById('final-cta');
+
+            if(input.value.length < 3) {
+                msg.innerText = "Ingresa un gametag válido.";
+                msg.style.color = "var(--mc-red)";
+                return;
+            }
+
+            msg.innerText = "CONECTANDO CON SERVIDORES DE MOJANG...";
+            msg.style.color = "var(--mc-gold)";
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 1;
+                bar.style.width = progress + '%';
+                
+                if(progress === 30) msg.innerText = "ANALIZANDO TOKENS PÚBLICOS...";
+                if(progress === 60) msg.innerText = "VERIFICANDO EXPOSICIÓN DE API...";
+                if(progress === 85) msg.innerText = "DETECTANDO VULNERABILIDADES...";
+
+                if(progress >= 100) {
+                    clearInterval(interval);
+                    msg.innerText = "¡ANÁLISIS COMPLETO! ESTADO CRÍTICO.";
+                    msg.style.color = "var(--mc-red)";
+                    cta.style.display = "block";
+                    cta.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 40);
+        }
+    </script>
+</body>
+</html>
